@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="./bootstrap.js?v=12.36.2"></script>
+    <link href="https://fonts.cdnfonts.com/css/digital-numbers" rel="stylesheet">
+    <title>LiFePO4 v12.36.2 (MQTT)</title>
+        <link rel="icon" href="favicon.svg" type="image/svg+xml">
+        <link rel="manifest" href="manifest.webmanifest">
+        <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+        </script>
+    <meta name="theme-color" content="#0d1117">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LiFePO4 MQTT">
+        <link rel="stylesheet" href="./styles.css?v=12.36.2">
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="./cellsChart.js?v=12.36.2"></script>
+</head>
+<body>
+<div class="scale-wrapper">
+    <div class="container">
+    <div class="topbar">
+       <br><br>
+    <button id="menuBtnTop" class="menu-trigger" type="button" onclick="(window.toggleSettings || function(){ var panel = document.getElementById('settingsPanelRoot'); if (panel) { panel.classList.remove('hidden'); panel.classList.toggle('open'); } })(); return false;">🛠</button>
+    </div>
+    <div id="dash">
+        <div class="section">
+            <div class="battery-row">
+                <div class="battery-body">
+                    <div class="battery-fill batt-fill" id="batt-fill"></div>
+                    <div class="v-main"><span id="v-val" class="v-val">00.00</span> <span id="soc-val" class="p-sub soc-val">00%</span></div>
+                </div>
+                <div class="battery-body">
+                    <div class="battery-fill batt-fill"></div>
+                    <div class="v-main"><span id="time-val" class="v-val">--</span></div>
+                </div>
+            </div>
+            <div class="pills">
+                <button id="charge-pill" class="pill" type="button" title="Toggle charge">CHARGE</button>
+                <button id="dischg-pill" class="pill" type="button" title="Toggle discharge">DISCHG</button>
+                <div id="balance-pill" class="pill">BALANCE</div>
+            </div>
+       </div>
+        <div class="section">
+            <div class="power-grid two-cols">
+            <div class="led-card"><span id="current-val" class="led-num">0.00A</span><span class="led-lbl">Current</span></div>
+            <div class="led-card"><span id="power-val" class="led-num">0.00W</span><span class="led-lbl">Power</span></div>
+                </div>
+            <div class="power-grid two-cols with-top-gap">
+                 <div class="led-card clickable" title="Tap to reset charged energy"><span id="energy-charged-val" class="led-num">0.00Wh</span><span class="led-lbl">Energy IN</span></div>                
+                <div class="led-card clickable" title="Tap to reset consumed energy"><span id="energy-consumed-val" class="led-num">0.00Wh</span><span class="led-lbl">Energy OUT</span></div>
+            </div>
+        </div>      
+            <div class="section">
+                <div class="mini-battery-grid">
+                    <div class="batt-container">
+                        <div class="batt-body">
+                            <div class="batt-fill"></div>
+                            <div class="batt-segments">
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div>
+                            </div>
+                            <span class="batt-val">0.000</span>
+                        </div>
+                        <div class="batt-tip"></div> 
+                        <div class="batt-label"></div>
+                        </div>
+                    <div class="batt-container">
+                        <div class="batt-body">
+                            <div class="batt-fill"></div>
+                            <div class="batt-segments">
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div>
+                            </div>
+                            <span class="batt-val">0.000</span>
+                        </div>
+                        <div class="batt-tip"></div>
+                        <div class="batt-label"></div>
+                    </div>
+                    <div class="batt-container">
+                        <div class="batt-body">
+                            <div class="batt-fill"></div>
+                            <div class="batt-segments">
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div>
+                            </div>
+                            <span class="batt-val">0.000</span>
+                        </div>
+                        <div class="batt-tip"></div>
+                        <div class="batt-label"></div>
+                    </div>
+                    <div class="batt-container">
+                        <div class="batt-body">
+                            <div class="batt-fill"></div>
+                            <div class="batt-segments">
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div><div class="segment-line"></div><div class="segment-line"></div>
+                                <div class="segment-line"></div>
+                            </div>
+                            <span class="batt-val">0.000</span>
+                        </div>
+                        <div class="batt-tip"></div>
+                        <div class="batt-label"></div>
+                    </div>
+                </div>
+                </div>
+            <div class="summary">
+                <div class="sum-box"><span class="led-lbl">MIN</span><span id="min-val" class="sum-v">0.000</span></div>
+                <div class="sum-box"><span class="led-lbl">DELTA</span><span id="delta-val" class="sum-v">0.000</span></div>
+                <div class="sum-box"><span class="led-lbl">MAX</span><span id="max-val" class="sum-v">0.000</span></div>
+            </div>
+            <div class="summary-extra" id="extra-summary"></div>
+                 <div class="chart-wrapper">
+                    <canvas id="cellsChart"></canvas>
+                </div>
+                <div id="chartPeriodSelector" class="chart-period-selector">
+                    <button class="period-btn active" data-period="0">1 мин</button>
+                    <button class="period-btn" data-period="1">3 мин</button>
+                    <button class="period-btn" data-period="2">5 мин</button>
+                    <button class="period-btn" data-period="3">10 мин</button>
+                </div>
+        </div>
+    </div>
+    <div id="settingsPanelRoot" class="settings-panel">
+    <div class="settings-contents">
+        <div id="tab-mqtt" class="settings-section active">
+            <div class="settings-card">
+                <div class="card-header">
+                    <div>
+                        <div class="muted muted-small"></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="mqttForm" onsubmit="return false;">
+                        <h3 class="settings-title">Настройки MQTT брокера</h3>
+                            <div class="ha-row mqtt-form-gap"></div>
+                            <div class="mqtt-row">
+                                <div class="mqtt-col flex-1">
+                                    <label class="small">Режим работы</label>
+                                    <select id="mqttMode" data-key="mqttMode">
+                                        <option value="client">Клиент</option>
+                                        <option value="server">Сервер</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mqtt-stack">
+                                <div class="mqtt-row">
+                                    <div class="mqtt-col flex-2">
+                                        <label class="small">Host</label>
+                                        <input id="mqttHost" data-key="mqttHost" type="text" placeholder="broker.emqx.io" value="broker.emqx.io">
+                                    </div>
+                                    <div class="mqtt-col flex-1">
+                                        <label class="small">Port</label>
+                                        <input id="mqttPort" data-key="mqttPort" type="number" min="1883" max="65535" value="8083">
+                                    </div>
+                                </div>
+                                <div class="mqtt-row tight">
+                                    <div class="mqtt-col flex-1">
+                                        <label class="small">User</label>
+                                        <input id="mqttUser" data-key="mqttUser" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+                                    </div>
+                                    <div class="mqtt-col flex-1">
+                                        <label class="small">Pass</label>
+                                        <input id="mqttPass" data-key="mqttPass" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false">
+                                    </div>
+                                </div>
+                                <!-- Topic -->
+                                <div class="topic-block">
+                                    <label class="small topic-label">Topic</label>
+                                    <input id="mqttTopic" data-key="mqttTopic" class="mqtt-topic-input" type="text" placeholder="shaman/32">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="btn-grid two-cols with-top-gap">
+                        <button class="btn" title="Save" onclick="saveMqttSettings()">💾 Сохранить</button>
+                        <button class="btn" type="button" title="Cancel" onclick="closeSettings(); return false;">✖ Отмена</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </div>
+    <div class="floating-stats">
+        <div class="fs-item" id="footer_mqtt_status"><span id="mqtt-status-text">MQTT</span></div>
+        <div class="fs-item" id="footer_temp_mos">🌡️<span id="temp-mos">00.0°C</span></div>
+    <div id="footer_data_status" class="muted footer-status"></div>
+        <div class="fs-item" id="footer_temp_t1"><span id="temp-t1">00.0°C</span></div>
+        <div class="fs-item" id="footer_mem">💾 -- / -- KB</div>
+        <div class="fs-item" id="footer_uptime">⏱️ 00:00:00</div>
+    </div>
+    </div>
+</div>
+<script src="./app2.js?v=12.33"></script>
+    <!-- ...existing code... -->
+</body>
+</html>

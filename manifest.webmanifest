@@ -1,0 +1,19 @@
+{
+  "name": "LiFePO4 MQTT Dashboard",
+  "short_name": "LiFePO4 MQTT",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "description": "Веб-интерфейс мониторинга LiFePO4 BMS через MQTT.",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

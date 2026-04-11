@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Firmware Updater - LiFePO4 BMS v12.30</title>
+    <link href="https://fonts.cdnfonts.com/css/digital-numbers" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(180deg, #0d1117, #010409);
+            color: #e6edf3;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #58a6ff, #79c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #8b949e;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #79c0ff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b949e;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="file"]:focus,
+        select:focus {
+            border-color: #58a6ff;
+            background: #0d1117;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: #2ea043;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2ea043, #3fb950);
+            box-shadow: 0 8px 16px rgba(35, 134, 54, 0.4);
+        }
+
+        .btn-secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .btn-secondary:hover {
+            background: #30363d;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #21262d;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #58a6ff, #79c0ff);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .status.info {
+            background: rgba(88, 166, 255, 0.15);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: #79c0ff;
+            display: block;
+        }
+
+        .status.success {
+            background: rgba(46, 160, 67, 0.15);
+            border: 1px solid rgba(46, 160, 67, 0.3);
+            color: #3fb950;
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            color: #f85149;
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .info-box strong {
+            color: #79c0ff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔧 Прошивка ESP32</h1>
+        <p>Обновление прошивки по UART</p>
+    </div>
+
+    <!-- Выбор порта и метода -->
+    <div class="card">
+        <div class="card-title">Подключение</div>
+        
+        <div class="form-group">
+            <label for="method">Метод прошивки</label>
+            <select id="method">
+                <option value="serial">Serial (UART) — USB-to-UART адаптер</option>
+                <option value="http">HTTP (OTA) — по сети Wi-Fi</option>
+            </select>
+        </div>
+
+        <div id="serial-section">
+            <div class="form-group">
+                <label for="serialPort">COM порт</label>
+                <select id="serialPort">
+                    <option value="">-- Выбрать порт --</option>
+                </select>
+                <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                    <button class="btn-secondary" style="width: auto;" onclick="requestPortAccess()">🔌 Подключить порт</button>
+                    <button class="btn-secondary" style="width: auto;" onclick="refreshPorts()">🔄 Обновить</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="baudRate">Скорость</label>
+                <select id="baudRate">
+                    <option value="115200" selected>115200 baud</option>
+                    <option value="921600">921600 baud</option>
+                    <option value="460800">460800 baud</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="http-section" style="display: none;">
+            <div class="form-group">
+                <label for="espUrl">IP адрес ESP32</label>
+                <input type="text" id="espUrl" placeholder="192.168.1.100" value="">
+            </div>
+
+            <div class="info-box">
+                <strong>Примечание:</strong> OTA обновление требует, чтобы ESP32 был включен и подключен к Wi-Fi сети.
+            </div>
+        </div>
+    </div>
+
+    <!-- Выбор файла -->
+    <div class="card">
+        <div class="card-title">Файл прошивки</div>
+        
+        <div class="info-box">
+            <strong>Где найти .bin файл:</strong><br>
+            • В VS Code → PlatformIO → Build → .pio/build/<env>/firmware.bin<br>
+            • Для этого проекта обычно: .pio/build/esp32-c3-devkitm-1/firmware.bin
+        </div>
+
+        <div class="form-group">
+            <label for="firmwareFile">Выбрать файл</label>
+            <input type="file" id="firmwareFile" accept=".bin">
+        </div>
+
+        <div id="fileInfo" style="font-size: 12px; color: #8b949e; margin-top: 8px; display: none;">
+            Файл: <span id="fileName"></span><br>
+            Размер: <span id="fileSize"></span>
+        </div>
+    </div>
+
+    <!-- Кнопка прошивки и прогресс -->
+    <div class="card">
+        <div class="button-group">
+            <button class="btn-primary" id="flashBtn" onclick="startFlashing()">⚡ Прошить ESP</button>
+            <button class="btn-secondary" id="cancelBtn" onclick="cancelFlashing()" style="display: none;">✗ Отмена</button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressPercent">0</span>% — <span id="progressStatus">Подготовка...</span>
+            </div>
+        </div>
+
+        <div class="status" id="status"></div>
+    </div>
+</div>
+
+<script>
+    const methodSelect = document.getElementById('method');
+    const serialSection = document.getElementById('serial-section');
+    const httpSection = document.getElementById('http-section');
+    const firmwareFile = document.getElementById('firmwareFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const flashBtn = document.getElementById('flashBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const statusDiv = document.getElementById('status');
+
+    let isFlashing = false;
+    let detectedPorts = [];
+
+    // Переключение между методами
+    methodSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'serial') {
+            serialSection.style.display = 'block';
+            httpSection.style.display = 'none';
+        } else {
+            serialSection.style.display = 'none';
+            httpSection.style.display = 'block';
+        }
+    });
+
+    // Отслеживание выбора файла
+    firmwareFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(2) + ' KB';
+            fileInfo.style.display = 'block';
+        } else {
+            fileInfo.style.display = 'none';
+        }
+    });
+
+    function renderPorts() {
+        const portSelect = document.getElementById('serialPort');
+        portSelect.innerHTML = '<option value="">-- Выбрать порт --</option>';
+
+        detectedPorts.forEach((port, index) => {
+            const info = port.getInfo ? port.getInfo() : {};
+            const vid = info.usbVendorId ? info.usbVendorId.toString(16).toUpperCase().padStart(4, '0') : '----';
+            const pid = info.usbProductId ? info.usbProductId.toString(16).toUpperCase().padStart(4, '0') : '----';
+            const option = document.createElement('option');
+            option.value = String(index);
+            option.textContent = `Порт ${index + 1} (VID:PID ${vid}:${pid})`;
+            portSelect.appendChild(option);
+        });
+    }
+
+    async function refreshPorts() {
+        if (!('serial' in navigator)) {
+            showStatus('Web Serial API недоступна. Используйте Chrome/Edge 89+', 'error');
+            return;
+        }
+
+        try {
+            detectedPorts = await navigator.serial.getPorts();
+            renderPorts();
+
+            if (detectedPorts.length === 0) {
+                showStatus('Портов нет. Нажмите "Подключить порт" и выберите устройство.', 'error');
+            } else {
+                showStatus(`Найдено ${detectedPorts.length} портов`, 'info');
+            }
+        } catch (error) {
+            showStatus('Ошибка доступа к портам: ' + error.message, 'error');
+        }
+    }
+
+    async function requestPortAccess() {
+        if (!('serial' in navigator)) {
+            showStatus('Web Serial API недоступна. Используйте Chrome/Edge 89+', 'error');
+            return;
+        }
+
+        try {
+            await navigator.serial.requestPort({});
+            await refreshPorts();
+            showStatus('Порт добавлен. Теперь можно выбрать его в списке.', 'success');
+        } catch (error) {
+            if (error && error.name === 'NotFoundError') {
+                showStatus('Выбор порта отменен пользователем.', 'info');
+                return;
+            }
+            showStatus('Не удалось запросить порт: ' + error.message, 'error');
+        }
+    }
+
+    async function startFlashing() {
+        const method = document.getElementById('method').value;
+        const file = firmwareFile.files[0];
+
+        if (!file) {
+            showStatus('Выберите файл прошивки', 'error');
+            return;
+        }
+
+        if (method === 'serial') {
+            await flashViaSerial(file);
+        } else {
+            await flashViaHTTP(file);
+        }
+    }
+
+    async function flashViaSerial(file) {
+        if (!('serial' in navigator)) {
+            showStatus('Браузер не поддерживает Web Serial API', 'error');
+            return;
+        }
+
+        const portSelect = document.getElementById('serialPort');
+        if (!portSelect.value) {
+            showStatus('Выберите COM порт', 'error');
+            return;
+        }
+
+        isFlashing = true;
+        updateButtons();
+        progressContainer.style.display = 'block';
+        showStatus('Подключение к порту...', 'info');
+
+        try {
+            if (!detectedPorts.length) {
+                await refreshPorts();
+            }
+
+            const port = detectedPorts[parseInt(portSelect.value, 10)];
+            if (!port) {
+                showStatus('Выбранный порт недоступен. Нажмите "Обновить".', 'error');
+                isFlashing = false;
+                updateButtons();
+                return;
+            }
+            const baudRate = parseInt(document.getElementById('baudRate').value);
+
+            await port.open({ baudRate });
+            showStatus('Подключено. Отправка файла...', 'info');
+
+            // Читаем файл
+            const buffer = await file.arrayBuffer();
+            const data = new Uint8Array(buffer);
+
+            // Отправляем данные с прогрессом
+            const chunkSize = 4096;
+            const writer = port.writable.getWriter();
+            try {
+                for (let i = 0; i < data.length; i += chunkSize) {
+                    const chunk = data.slice(i, i + chunkSize);
+                    await writer.write(chunk);
+
+                    const percent = Math.round((i / data.length) * 100);
+                    updateProgress(percent, `Отправлено ${percent}%`);
+                }
+            } finally {
+                writer.releaseLock();
+            }
+
+            // Закрываем порт
+            await port.close();
+
+            showStatus('✓ Прошивка завершена! Перезагружаем ESP...', 'success');
+            updateProgress(100, 'Готово');
+        } catch (error) {
+            showStatus('✗ Ошибка: ' + error.message, 'error');
+        } finally {
+            isFlashing = false;
+            updateButtons();
+        }
+    }
+
+    async function flashViaHTTP(file) {
+        const espUrl = document.getElementById('espUrl').value;
+        if (!espUrl) {
+            showStatus('Введите IP адрес ESP32', 'error');
+            return;
+        }
+
+        isFlashing = true;
+        updateButtons();
+        progressContainer.style.display = 'block';
+        showStatus('Подключение к ESP32...', 'info');
+
+        try {
+            const buffer = await file.arrayBuffer();
+            const formData = new FormData();
+            formData.append('file', new Blob([buffer]), file.name);
+
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    updateProgress(percent, `Загружено ${percent}%`);
+                }
+            });
+
+            xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    showStatus('✓ Прошивка завершена! Перезагружаем ESP...', 'success');
+                    updateProgress(100, 'Готово');
+                } else {
+                    showStatus('✗ Ошибка на сервере: ' + xhr.statusText, 'error');
+                }
+                isFlashing = false;
+                updateButtons();
+            });
+
+            xhr.addEventListener('error', () => {
+                showStatus('✗ Ошибка подключения к ESP32', 'error');
+                isFlashing = false;
+                updateButtons();
+            });
+
+            xhr.open('POST', `http://${espUrl}/update`);
+            xhr.send(formData);
+        } catch (error) {
+            showStatus('✗ Ошибка: ' + error.message, 'error');
+            isFlashing = false;
+            updateButtons();
+        }
+    }
+
+    function updateProgress(percent, status) {
+        document.getElementById('progressFill').style.width = percent + '%';
+        document.getElementById('progressPercent').textContent = percent;
+        document.getElementById('progressStatus').textContent = status;
+    }
+
+    function updateButtons() {
+        flashBtn.disabled = isFlashing;
+        cancelBtn.style.display = isFlashing ? 'block' : 'none';
+    }
+
+    function cancelFlashing() {
+        isFlashing = false;
+        updateButtons();
+        progressContainer.style.display = 'none';
+        showStatus('Прошивка отменена', 'error');
+    }
+
+    function showStatus(message, type) {
+        statusDiv.textContent = message;
+        statusDiv.className = 'status ' + type;
+    }
+
+    navigator.serial?.addEventListener?.('connect', refreshPorts);
+    navigator.serial?.addEventListener?.('disconnect', refreshPorts);
+
+    // Инициализация при загрузке страницы
+    window.addEventListener('load', async () => {
+        if ('serial' in navigator) await refreshPorts();
+    });
+</script>
+</body>
+</html>
