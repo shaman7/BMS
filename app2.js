@@ -619,7 +619,9 @@ function getBaseTopic() {
 }
 
 function sendMqttCmd(cmd, payload) {
-    if (!isMqttServerMode()) return false; // Только в режиме сервер
+    // Разрешаем mosfet_chg/set и mosfet_dis/set в любом режиме
+    const isMosfetCmd = cmd === 'mosfet_chg/set' || cmd === 'mosfet_dis/set';
+    if (!isMosfetCmd && !isMqttServerMode()) return false;
     if (!client) {
         console.warn('[MQTT publish] НЕ отправлено: client не определён', cmd, payload);
         return false;
