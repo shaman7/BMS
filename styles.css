@@ -220,7 +220,7 @@ body {
     color: var(--text);
     padding: 8px;
     margin: 0;
-    padding-bottom: 140px;
+    padding-bottom: 16px;
     overflow-x: hidden;
 }
 
@@ -228,6 +228,7 @@ body {
     width: 100%;
     max-width: 100%;
     margin: auto;
+    margin-top: 58px; /* добавлен отступ сверху для меню */
 }
 .topbar {
     display: flex;
@@ -236,6 +237,7 @@ body {
     margin-bottom: 10px;
     position: relative;
     max-width: 100vw;
+    height: 48px; /* фиксированная высота для topbar */
 }
 .menu-trigger {
     background: none;

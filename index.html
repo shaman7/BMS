@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="./bootstrap.js?v=12.36.2"></script>
+    <script src="./bootstrap.js?v=12.36.6 C3"></script>
     <link href="https://fonts.cdnfonts.com/css/digital-numbers" rel="stylesheet">
-    <title>LiFePO4 v12.36.2 (MQTT)</title>
+    <title>LiFePO4 v12.36.6 C3 (MQTT)</title>
         <link rel="icon" href="favicon.svg" type="image/svg+xml">
         <link rel="manifest" href="manifest.webmanifest">
         <script>
@@ -20,17 +20,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LiFePO4 MQTT">
-        <link rel="stylesheet" href="./styles.css?v=12.36.2">
+        <link rel="stylesheet" href="./styles.css?v=12.36.6 C3">
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-<script src="./cellsChart.js?v=12.36.2"></script>
+<script src="./cellsChart.js?v=12.36.6 C3"></script>
 </head>
 <body>
 <div class="scale-wrapper">
     <div class="container">
     <div class="topbar">
-       <br><br>
-    <button id="menuBtnTop" class="menu-trigger" type="button" onclick="(window.toggleSettings || function(){ var panel = document.getElementById('settingsPanelRoot'); if (panel) { panel.classList.remove('hidden'); panel.classList.toggle('open'); } })(); return false;">🛠</button>
+      
     </div>
     <div id="dash">
         <div class="section">
@@ -203,6 +202,21 @@
     </div>
 </div>
 <script src="./app2.js?v=12.33"></script>
+    <script>
+    // Открытие меню по клику на #time-val
+    document.addEventListener('DOMContentLoaded', function() {
+        var timeVal = document.getElementById('time-val');
+        if (timeVal) {
+            timeVal.addEventListener('click', function() {
+                var panel = document.getElementById('settingsPanelRoot');
+                if (panel) {
+                    panel.classList.remove('hidden');
+                    panel.classList.toggle('open');
+                }
+            });
+        }
+    });
+    </script>
     <!-- ...existing code... -->
 </body>
 </html>

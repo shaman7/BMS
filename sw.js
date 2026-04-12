@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifepo4-mqtt-pwa-v12.36.2';
+const CACHE_NAME = 'lifepo4-mqtt-pwa-v12.36.6 C3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
